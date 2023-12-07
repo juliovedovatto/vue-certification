@@ -94,10 +94,26 @@ watch(hasDied, () => {
 });
 
 const setInitialPosition = () => {
-  posX.value =
-    Math.random() * (container.value.clientWidth - element.value.clientWidth);
-  posY.value =
-    Math.random() * (container.value.clientHeight - element.value.clientHeight);
+  do {
+    posX.value =
+      Math.random() * (container.value.clientWidth - element.value.clientWidth);
+    posY.value =
+      Math.random() *
+      (container.value.clientHeight - element.value.clientHeight);
+  } while (
+    checkCollisionWalls(posX.value, "x") ||
+    checkCollisionWalls(posY.value, "y")
+  );
+};
+
+const checkCollisionWalls = (pos, axis) => {
+  if (!["x", "y"].includes(axis)) {
+    return;
+  }
+
+  const property = axis == "x" ? "clientWidth" : "clientHeight";
+
+  return pos + element.value[property] > container.value[property] || pos < 0;
 };
 
 const startAnimation = () => {
@@ -127,18 +143,12 @@ const startAnimation = () => {
     currentY += vy;
 
     // Check for collisions with container walls
-    if (
-      currentX + element.value.clientWidth > container.value.clientWidth ||
-      currentX < 0
-    ) {
+    if (checkCollisionWalls(currentX, "x")) {
       vx = -vx; // reverse velocity on collision with horizontal walls
       movingDirection.value = vx >= 0 ? "left" : "right";
     }
 
-    if (
-      currentY + element.value.clientHeight > container.value.clientHeight ||
-      currentY < 0
-    ) {
+    if (checkCollisionWalls(currentY, "y")) {
       vy = -vy; // reverse velocity on collision with vertical walls
     }
 
@@ -159,13 +169,12 @@ const startDeadAnimation = () => {
     let currentY = parseFloat(posY.value);
     currentY += vy;
 
-    if (currentY + element.value.clientHeight > container.value.clientHeight) {
+    if (checkCollisionWalls(currentY, "y")) {
       hasDiedAnimationDone.value = true;
       return;
     }
 
     posY.value = currentY;
-
     requestAnimationFrame(updatePosition);
   };
 
