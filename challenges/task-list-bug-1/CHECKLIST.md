@@ -1,0 +1,3 @@
+- The addTask method adds a new task object to the tasks array
+- The removeTask method removes a task object from the tasks array based on its id.
+- There are no bugs related to rendering and reactivity issues when adding or removing tasks.
